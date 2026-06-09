@@ -1,6 +1,6 @@
 # OpenClaw Frontend
 
-React + Vite + TypeScript frontend for OpenClaw.
+React + Vite lead bot UI for OpenClaw.
 
 ## Setup
 
@@ -8,6 +8,8 @@ React + Vite + TypeScript frontend for OpenClaw.
 npm install
 npm run dev
 ```
+
+Make sure the backend is running on port 3000 (`cd ../backend && npm run dev`).
 
 ## Scripts
 
