@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { BrandLogo } from "./BrandLogo";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function Header() {
   const { user, logout, isAuthenticated } = useAuth();
@@ -10,8 +11,10 @@ export function Header() {
     <header className="header">
       <div className="header-top">
         <BrandLogo size="sm" />
-        {isAuthenticated && (
-          <div className="header-actions">
+        <div className="header-actions">
+          <ThemeToggle />
+          {isAuthenticated && (
+            <>
             <span className="user-badge">
               {user?.name}
               {user?.role === "admin" && <span className="badge badge-success">Admin</span>}
@@ -19,8 +22,9 @@ export function Header() {
             <button type="button" className="btn-secondary btn-sm" onClick={logout}>
               Log out
             </button>
-          </div>
-        )}
+            </>
+          )}
+        </div>
       </div>
 
       {isAuthenticated && (

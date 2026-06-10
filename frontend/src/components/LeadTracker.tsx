@@ -46,6 +46,39 @@ function formatDateForInput(value: string | null | undefined): string {
   return match ? match[1] : "";
 }
 
+function canManageRow(row: TrackerRow, userId: number | undefined, isAdmin: boolean): boolean {
+  return isAdmin || row.userId === userId;
+}
+
+const LINK_FIELDS = new Set<keyof TrackerRowInput>(["email", "source"]);
+
+function getLinkHref(field: keyof TrackerRowInput, value: string): string | null {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+
+  if (field === "email") {
+    const email = trimmed.replace(/^mailto:/i, "");
+    if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return `mailto:${email}`;
+    return null;
+  }
+
+  if (field === "source") {
+    if (/^https?:\/\//i.test(trimmed)) return trimmed;
+    if (/^www\./i.test(trimmed)) return `https://${trimmed}`;
+    if (/^[a-z0-9][-a-z0-9]*(\.[a-z0-9][-a-z0-9]*)+([\/?#].*)?$/i.test(trimmed)) {
+      return `https://${trimmed}`;
+    }
+    return null;
+  }
+
+  return null;
+}
+
+function getCellValue(row: TrackerRow, field: keyof TrackerRowInput): string {
+  if (field === "date") return formatDateForInput(row.date);
+  return ((row[field] ?? "") as string);
+}
+
 export function LeadTracker() {
   const { user } = useAuth();
   const [tracker, setTracker] = useState<TrackerState | null>(null);
@@ -54,6 +87,7 @@ export function LeadTracker() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [editingCell, setEditingCell] = useState<string | null>(null);
 
   const isAdmin = tracker?.isAdmin ?? user?.role === "admin";
   const showOwnerColumn = isAdmin;
@@ -138,7 +172,7 @@ export function LeadTracker() {
         <p className="subtitle">
           {isAdmin
             ? "Admin view — see all team leads. The Team Member column shows who added each lead."
-            : "Your personal lead sheet. Columns: Date, Name, Job Title, Email, LinkedIn, Phone, Source, Remarks, Connects, Project Price."}
+            : "Your personal lead sheet — add, edit, and delete your own leads. Click any cell to update it."}
         </p>
 
         {isAdmin && tracker?.users && (
@@ -243,23 +277,58 @@ export function LeadTracker() {
                           {row.ownerName ?? user?.name ?? "Unknown"}
                         </td>
                       )}
-                      {FIELD_KEYS.map((field) => (
-                        <td key={field}>
-                          <input
-                            className="tracker-cell-input"
-                            type={field === "date" ? "date" : "text"}
-                            defaultValue={
-                              field === "date"
-                                ? formatDateForInput(row.date)
-                                : ((row[field] as string) ?? "")
-                            }
-                            onBlur={(e) => handleCellBlur(row, field, e.target.value)}
-                            disabled={!isAdmin && row.userId !== user?.id}
-                          />
-                        </td>
-                      ))}
+                      {FIELD_KEYS.map((field) => {
+                        const value = getCellValue(row, field);
+                        const cellKey = `${row.id}-${field}`;
+                        const editable = canManageRow(row, user?.id, isAdmin);
+                        const href = LINK_FIELDS.has(field) ? getLinkHref(field, value) : null;
+                        const isEditing = editingCell === cellKey;
+                        const showAsLink = LINK_FIELDS.has(field) && href && !isEditing;
+
+                        if (showAsLink) {
+                          return (
+                            <td key={field} className="tracker-link-cell">
+                              <a
+                                className="tracker-cell-link"
+                                href={href}
+                                target={field === "email" ? undefined : "_blank"}
+                                rel={field === "email" ? undefined : "noopener noreferrer"}
+                                title={field === "email" ? `Email ${value}` : `Open ${value}`}
+                              >
+                                {value}
+                              </a>
+                              {editable && (
+                                <button
+                                  type="button"
+                                  className="tracker-cell-edit"
+                                  onClick={() => setEditingCell(cellKey)}
+                                  title="Edit"
+                                >
+                                  Edit
+                                </button>
+                              )}
+                            </td>
+                          );
+                        }
+
+                        return (
+                          <td key={field}>
+                            <input
+                              className="tracker-cell-input"
+                              type={field === "date" ? "date" : "text"}
+                              defaultValue={value}
+                              autoFocus={isEditing}
+                              onBlur={(e) => {
+                                handleCellBlur(row, field, e.target.value);
+                                if (isEditing) setEditingCell(null);
+                              }}
+                              disabled={!editable}
+                            />
+                          </td>
+                        );
+                      })}
                       <td>
-                        {(row.userId === user?.id || isAdmin) && (
+                        {canManageRow(row, user?.id, isAdmin) && (
                           <button
                             type="button"
                             className="btn-danger btn-sm tracker-delete-btn"

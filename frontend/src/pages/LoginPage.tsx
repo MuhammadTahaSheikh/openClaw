@@ -1,6 +1,7 @@
 import { FormEvent, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { BrandLogo } from "../components/BrandLogo";
+import { ThemeToggle } from "../components/ThemeToggle";
 import { useAuth } from "../context/AuthContext";
 
 export function LoginPage() {
@@ -33,6 +34,7 @@ export function LoginPage() {
 
   return (
     <main className="auth-page">
+      <ThemeToggle className="auth-theme-toggle" />
       <div className="panel auth-panel">
         <BrandLogo size="lg" />
         <p className="subtitle">Sign in to continue</p>

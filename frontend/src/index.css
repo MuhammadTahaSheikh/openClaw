@@ -1,5 +1,20 @@
 /* ─── Design tokens ─────────────────────────────────────────────── */
 :root {
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+
+  --font: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --content-max: 56rem;
+  --tracker-max: 76rem;
+  --transition: 0.15s ease;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
   --bg-base: #0b1120;
   --bg-elevated: #0f172a;
   --bg-surface: #1e293b;
@@ -19,29 +34,106 @@
   --accent-hover: #60a5fa;
   --accent-muted: #93c5fd;
   --accent-glow: rgba(59, 130, 246, 0.35);
+  --accent-gradient-end: #2563eb;
 
   --success: #86efac;
   --success-bg: rgba(34, 197, 94, 0.12);
   --warning: #fde68a;
   --warning-bg: rgba(234, 179, 8, 0.1);
+  --warning-strong: #fef3c7;
   --error: #fca5a5;
   --error-bg: rgba(239, 68, 68, 0.1);
-
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
-  --radius-full: 9999px;
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25);
   --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.3);
   --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.35);
   --shadow-glow: 0 4px 24px var(--accent-glow);
 
-  --font: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  --content-max: 56rem;
-  --tracker-max: 76rem;
-  --transition: 0.15s ease;
+  --header-bg: rgba(11, 17, 32, 0.82);
+  --panel-bg: rgba(30, 41, 59, 0.65);
+  --body-gradient-1: rgba(59, 130, 246, 0.14);
+  --body-gradient-2: rgba(99, 102, 241, 0.1);
+  --body-gradient-3: rgba(14, 165, 233, 0.06);
+  --selection-bg: rgba(59, 130, 246, 0.35);
+  --selection-color: #fff;
+  --brand-gradient-start: #fff;
+  --btn-primary-text: #fff;
+  --danger-border: rgba(239, 68, 68, 0.35);
+  --danger-bg: rgba(127, 29, 29, 0.2);
+  --danger-text: #fecaca;
+  --danger-bg-hover: rgba(185, 28, 28, 0.35);
+  --danger-border-hover: rgba(239, 68, 68, 0.5);
+  --focus-ring: rgba(59, 130, 246, 0.15);
+  --error-border: rgba(239, 68, 68, 0.25);
+  --success-border: rgba(34, 197, 94, 0.25);
+  --warning-border: rgba(234, 179, 8, 0.25);
+  --skill-bg: rgba(59, 130, 246, 0.12);
+  --skill-border: rgba(59, 130, 246, 0.15);
+  --row-hover-bg: rgba(59, 130, 246, 0.06);
+  --tracker-form-bg: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.6) 100%);
+  --user-badge-glow: rgba(134, 239, 172, 0.5);
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+
+  --bg-base: #f8fafc;
+  --bg-elevated: #ffffff;
+  --bg-surface: #f1f5f9;
+  --bg-surface-hover: #e2e8f0;
+  --bg-input: #ffffff;
+
+  --border: rgba(15, 23, 42, 0.08);
+  --border-strong: rgba(15, 23, 42, 0.14);
+  --border-focus: rgba(37, 99, 235, 0.45);
+
+  --text: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --text-subtle: #94a3b8;
+
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-muted: #3b82f6;
+  --accent-glow: rgba(37, 99, 235, 0.2);
+  --accent-gradient-end: #1d4ed8;
+
+  --success: #15803d;
+  --success-bg: rgba(34, 197, 94, 0.12);
+  --warning: #a16207;
+  --warning-bg: rgba(234, 179, 8, 0.12);
+  --warning-strong: #854d0e;
+  --error: #b91c1c;
+  --error-bg: rgba(239, 68, 68, 0.1);
+
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 4px 20px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 8px 32px rgba(15, 23, 42, 0.1);
+  --shadow-glow: 0 4px 24px var(--accent-glow);
+
+  --header-bg: rgba(255, 255, 255, 0.88);
+  --panel-bg: rgba(255, 255, 255, 0.92);
+  --body-gradient-1: rgba(59, 130, 246, 0.1);
+  --body-gradient-2: rgba(99, 102, 241, 0.08);
+  --body-gradient-3: rgba(14, 165, 233, 0.06);
+  --selection-bg: rgba(37, 99, 235, 0.2);
+  --selection-color: #0f172a;
+  --brand-gradient-start: #0f172a;
+  --btn-primary-text: #fff;
+  --danger-border: rgba(239, 68, 68, 0.35);
+  --danger-bg: rgba(254, 226, 226, 0.85);
+  --danger-text: #b91c1c;
+  --danger-bg-hover: rgba(254, 202, 202, 0.95);
+  --danger-border-hover: rgba(239, 68, 68, 0.5);
+  --focus-ring: rgba(37, 99, 235, 0.15);
+  --error-border: rgba(239, 68, 68, 0.25);
+  --success-border: rgba(34, 197, 94, 0.3);
+  --warning-border: rgba(234, 179, 8, 0.35);
+  --skill-bg: rgba(37, 99, 235, 0.1);
+  --skill-border: rgba(37, 99, 235, 0.15);
+  --row-hover-bg: rgba(37, 99, 235, 0.06);
+  --tracker-form-bg: linear-gradient(180deg, rgba(241, 245, 249, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%);
+  --user-badge-glow: rgba(21, 128, 61, 0.35);
 }
 
 /* ─── Reset & base ──────────────────────────────────────────────── */
@@ -64,6 +156,9 @@ body {
   line-height: 1.6;
   background: var(--bg-base);
   color: var(--text);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 body::before {
@@ -72,16 +167,17 @@ body::before {
   inset: 0;
   z-index: -1;
   background:
-    radial-gradient(ellipse 80% 50% at 20% -10%, rgba(59, 130, 246, 0.14), transparent),
-    radial-gradient(ellipse 60% 40% at 90% 10%, rgba(99, 102, 241, 0.1), transparent),
-    radial-gradient(ellipse 50% 30% at 50% 100%, rgba(14, 165, 233, 0.06), transparent),
+    radial-gradient(ellipse 80% 50% at 20% -10%, var(--body-gradient-1), transparent),
+    radial-gradient(ellipse 60% 40% at 90% 10%, var(--body-gradient-2), transparent),
+    radial-gradient(ellipse 50% 30% at 50% 100%, var(--body-gradient-3), transparent),
     var(--bg-base);
   pointer-events: none;
+  transition: background 0.2s ease;
 }
 
 ::selection {
-  background: rgba(59, 130, 246, 0.35);
-  color: #fff;
+  background: var(--selection-bg);
+  color: var(--selection-color);
 }
 
 :focus-visible {
@@ -156,7 +252,7 @@ body::before {
   width: min(100%, var(--content-max));
   padding: 0.75rem 1rem;
   margin: -0.25rem 0 0;
-  background: rgba(11, 17, 32, 0.82);
+  background: var(--header-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--border);
@@ -197,7 +293,7 @@ body::before {
   height: 7px;
   border-radius: 50%;
   background: var(--success);
-  box-shadow: 0 0 6px rgba(134, 239, 172, 0.5);
+  box-shadow: 0 0 6px var(--user-badge-glow);
   flex-shrink: 0;
 }
 
@@ -223,7 +319,7 @@ body::before {
 .brand-logo__name {
   font-weight: 700;
   letter-spacing: -0.02em;
-  background: linear-gradient(135deg, #fff 0%, var(--accent-muted) 100%);
+  background: linear-gradient(135deg, var(--brand-gradient-start) 0%, var(--accent-muted) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -284,7 +380,7 @@ body::before {
 
 /* ─── Panels ────────────────────────────────────────────────────── */
 .panel {
-  background: rgba(30, 41, 59, 0.65);
+  background: var(--panel-bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   padding: 1.5rem;
@@ -364,8 +460,8 @@ body::before {
 
 .btn-primary {
   border: none;
-  background: linear-gradient(135deg, var(--accent) 0%, #2563eb 100%);
-  color: #fff;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-gradient-end) 100%);
+  color: var(--btn-primary-text);
   box-shadow: var(--shadow-sm), var(--shadow-glow);
 }
 
@@ -400,14 +496,14 @@ body::before {
 }
 
 .btn-danger {
-  border: 1px solid rgba(239, 68, 68, 0.35);
-  background: rgba(127, 29, 29, 0.2);
-  color: #fecaca;
+  border: 1px solid var(--danger-border);
+  background: var(--danger-bg);
+  color: var(--danger-text);
 }
 
 .btn-danger:hover:not(:disabled) {
-  background: rgba(185, 28, 28, 0.35);
-  border-color: rgba(239, 68, 68, 0.5);
+  background: var(--danger-bg-hover);
+  border-color: var(--danger-border-hover);
 }
 
 .btn-sm {
@@ -513,13 +609,13 @@ body::before {
 .tracker-add-grid input:focus {
   outline: none;
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  box-shadow: 0 0 0 3px var(--focus-ring);
 }
 
 .bot-form input[type="date"],
 .tracker-add-grid input[type="date"],
 .tracker-cell-input[type="date"] {
-  color-scheme: dark;
+  color-scheme: light dark;
 }
 
 .bot-form button[type="submit"],
@@ -553,11 +649,18 @@ body::before {
 
 /* ─── Auth pages ────────────────────────────────────────────────── */
 .auth-page {
+  position: relative;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 2rem 1rem;
+}
+
+.auth-theme-toggle {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
 }
 
 .auth-panel {
@@ -615,7 +718,7 @@ body::before {
   padding: 0.65rem 0.85rem;
   border-radius: var(--radius-md);
   background: var(--error-bg);
-  border: 1px solid rgba(239, 68, 68, 0.25);
+  border: 1px solid var(--error-border);
   color: var(--error);
   font-size: 0.875rem;
 }
@@ -625,7 +728,7 @@ body::before {
   padding: 0.65rem 0.85rem;
   border-radius: var(--radius-md);
   background: var(--success-bg);
-  border: 1px solid rgba(34, 197, 94, 0.25);
+  border: 1px solid var(--success-border);
   color: var(--success);
   font-size: 0.875rem;
 }
@@ -635,14 +738,14 @@ body::before {
   padding: 0.85rem 1rem;
   border-radius: var(--radius-md);
   background: var(--warning-bg);
-  border: 1px solid rgba(234, 179, 8, 0.25);
+  border: 1px solid var(--warning-border);
   color: var(--warning);
   font-size: 0.875rem;
   line-height: 1.5;
 }
 
 .date-filter-warning strong {
-  color: #fef3c7;
+  color: var(--warning-strong);
 }
 
 /* ─── Results & export ──────────────────────────────────────────── */
@@ -759,13 +862,13 @@ body::before {
 }
 
 .skill {
-  background: rgba(59, 130, 246, 0.12);
+  background: var(--skill-bg);
   color: var(--accent-muted);
   padding: 0.2rem 0.5rem;
   border-radius: var(--radius-sm);
   font-size: 0.75rem;
   font-weight: 500;
-  border: 1px solid rgba(59, 130, 246, 0.15);
+  border: 1px solid var(--skill-border);
 }
 
 /* ─── Badges ────────────────────────────────────────────────────── */
@@ -783,13 +886,13 @@ body::before {
 .badge-success {
   background: var(--success-bg);
   color: var(--success);
-  border-color: rgba(34, 197, 94, 0.25);
+  border-color: var(--success-border);
 }
 
 .badge-pending {
   background: var(--warning-bg);
   color: var(--warning);
-  border-color: rgba(234, 179, 8, 0.25);
+  border-color: var(--warning-border);
 }
 
 /* ─── Tables ────────────────────────────────────────────────────── */
@@ -844,7 +947,7 @@ body::before {
 }
 
 .history-row-clickable:hover {
-  background: rgba(59, 130, 246, 0.06);
+  background: var(--row-hover-bg);
 }
 
 .history-row-clickable:hover td:first-child {
@@ -952,7 +1055,42 @@ body::before {
   padding: 1.25rem 1.35rem;
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-lg);
-  background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.6) 100%);
+  background: var(--tracker-form-bg);
+}
+
+/* ─── Theme toggle ──────────────────────────────────────────────── */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    background var(--transition),
+    border-color var(--transition),
+    color var(--transition),
+    transform 0.1s ease;
+}
+
+.theme-toggle svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.theme-toggle:hover {
+  background: var(--bg-surface);
+  border-color: var(--text-subtle);
+  color: var(--text);
+}
+
+.theme-toggle:active {
+  transform: scale(0.96);
 }
 
 .tracker-add-form h3 {
@@ -990,6 +1128,48 @@ body::before {
 .tracker-table th:last-child,
 .tracker-table td:last-child {
   border-right: none;
+}
+
+.tracker-link-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 8rem;
+}
+
+.tracker-cell-link {
+  color: var(--accent-muted);
+  text-decoration: none;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  word-break: break-all;
+  transition: color var(--transition);
+}
+
+.tracker-cell-link:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+.tracker-cell-edit {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-subtle);
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  padding: 0.15rem 0.25rem;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition), background var(--transition);
+}
+
+.tracker-cell-edit:hover {
+  color: var(--text-secondary);
+  background: var(--bg-surface);
 }
 
 .tracker-cell-input {

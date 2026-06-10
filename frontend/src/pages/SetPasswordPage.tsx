@@ -2,6 +2,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { setPasswordFromInvite, verifyInvite } from "../api/auth";
 import { BrandLogo } from "../components/BrandLogo";
+import { ThemeToggle } from "../components/ThemeToggle";
 import { useAuth } from "../context/AuthContext";
 
 export function SetPasswordPage() {
@@ -67,6 +68,7 @@ export function SetPasswordPage() {
   if (loadingInvite) {
     return (
       <main className="auth-page">
+        <ThemeToggle className="auth-theme-toggle" />
         <div className="panel auth-panel loading-inline">
           <div className="spinner" aria-hidden />
           <p className="meta">Verifying invite…</p>
@@ -78,6 +80,7 @@ export function SetPasswordPage() {
   if (inviteError) {
     return (
       <main className="auth-page">
+        <ThemeToggle className="auth-theme-toggle" />
         <div className="panel auth-panel">
           <h1>Invite expired</h1>
           <p className="error">{inviteError}</p>
@@ -92,6 +95,7 @@ export function SetPasswordPage() {
 
   return (
     <main className="auth-page">
+      <ThemeToggle className="auth-theme-toggle" />
       <div className="panel auth-panel">
         <BrandLogo size="md" />
         <h1>Set your password</h1>
