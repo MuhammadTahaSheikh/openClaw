@@ -46,10 +46,6 @@ function formatDateForInput(value: string | null | undefined): string {
   return match ? match[1] : "";
 }
 
-function canManageRow(row: TrackerRow, userId: number | undefined, isAdmin: boolean): boolean {
-  return isAdmin || row.userId === userId;
-}
-
 const LINK_FIELDS = new Set<keyof TrackerRowInput>(["email", "source"]);
 
 function getLinkHref(field: keyof TrackerRowInput, value: string): string | null {
@@ -89,9 +85,7 @@ export function LeadTracker() {
   const [error, setError] = useState<string | null>(null);
   const [editingCell, setEditingCell] = useState<string | null>(null);
 
-  const isAdmin = tracker?.isAdmin ?? user?.role === "admin";
-  const showOwnerColumn = isAdmin;
-  const canAddRows = !isAdmin || filterUserId === user?.id;
+  const showOwnerColumn = true;
 
   async function loadTracker(userId?: number) {
     setError(null);
@@ -170,12 +164,11 @@ export function LeadTracker() {
       <section className="panel">
         <h2>Lead Tracker</h2>
         <p className="subtitle">
-          {isAdmin
-            ? "Admin view — see all team leads. The Team Member column shows who added each lead."
-            : "Your personal lead sheet — add, edit, and delete your own leads. Click any cell to update it."}
+          Shared team lead sheet — everyone can add, edit, and delete leads. The Team Member column
+          shows who added each row.
         </p>
 
-        {isAdmin && tracker?.users && (
+        {tracker?.users && (
           <div className="tracker-filter">
             <label>
               Show leads for
@@ -212,8 +205,7 @@ export function LeadTracker() {
 
         {tracker && (
           <>
-            {canAddRows && (
-              <form className="tracker-add-form" onSubmit={handleAddRow}>
+            <form className="tracker-add-form" onSubmit={handleAddRow}>
                 <h3>New lead</h3>
                 <div className="tracker-add-grid">
                   {FIELD_KEYS.map((field, index) => (
@@ -245,8 +237,7 @@ export function LeadTracker() {
                     )}
                   </button>
                 </div>
-              </form>
-            )}
+            </form>
 
             <div className="tracker-table-wrap">
               <table className="tracker-table">
@@ -266,7 +257,7 @@ export function LeadTracker() {
                         colSpan={tracker.headers.length + (showOwnerColumn ? 2 : 1)}
                         className="tracker-empty"
                       >
-                        No rows yet{canAddRows ? ". Add your first lead above." : "."}
+                        No rows yet. Add your first lead above.
                       </td>
                     </tr>
                   )}
@@ -280,7 +271,6 @@ export function LeadTracker() {
                       {FIELD_KEYS.map((field) => {
                         const value = getCellValue(row, field);
                         const cellKey = `${row.id}-${field}`;
-                        const editable = canManageRow(row, user?.id, isAdmin);
                         const href = LINK_FIELDS.has(field) ? getLinkHref(field, value) : null;
                         const isEditing = editingCell === cellKey;
                         const showAsLink = LINK_FIELDS.has(field) && href && !isEditing;
@@ -297,16 +287,14 @@ export function LeadTracker() {
                               >
                                 {value}
                               </a>
-                              {editable && (
-                                <button
-                                  type="button"
-                                  className="tracker-cell-edit"
-                                  onClick={() => setEditingCell(cellKey)}
-                                  title="Edit"
-                                >
-                                  Edit
-                                </button>
-                              )}
+                              <button
+                                type="button"
+                                className="tracker-cell-edit"
+                                onClick={() => setEditingCell(cellKey)}
+                                title="Edit"
+                              >
+                                Edit
+                              </button>
                             </td>
                           );
                         }
@@ -322,21 +310,18 @@ export function LeadTracker() {
                                 handleCellBlur(row, field, e.target.value);
                                 if (isEditing) setEditingCell(null);
                               }}
-                              disabled={!editable}
                             />
                           </td>
                         );
                       })}
                       <td>
-                        {canManageRow(row, user?.id, isAdmin) && (
-                          <button
-                            type="button"
-                            className="btn-danger btn-sm tracker-delete-btn"
-                            onClick={() => handleDelete(row.id)}
-                          >
-                            Delete
-                          </button>
-                        )}
+                        <button
+                          type="button"
+                          className="btn-danger btn-sm tracker-delete-btn"
+                          onClick={() => handleDelete(row.id)}
+                        >
+                          Delete
+                        </button>
                       </td>
                     </tr>
                   ))}
