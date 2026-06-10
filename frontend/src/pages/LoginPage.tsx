@@ -1,5 +1,6 @@
 import { FormEvent, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
+import { BrandLogo } from "../components/BrandLogo";
 import { useAuth } from "../context/AuthContext";
 
 export function LoginPage() {
@@ -33,7 +34,7 @@ export function LoginPage() {
   return (
     <main className="auth-page">
       <div className="panel auth-panel">
-        <h1>OpenClaw</h1>
+        <BrandLogo size="lg" />
         <p className="subtitle">Sign in to continue</p>
 
         <form className="auth-form" onSubmit={handleSubmit}>
@@ -63,8 +64,15 @@ export function LoginPage() {
 
           {error && <p className="error">{error}</p>}
 
-          <button type="submit" disabled={submitting}>
-            {submitting ? "Signing in..." : "Sign in"}
+          <button type="submit" className="btn-primary" disabled={submitting}>
+            {submitting ? (
+              <>
+                <span className="spinner spinner-sm" aria-hidden />
+                Signing in…
+              </>
+            ) : (
+              "Sign in"
+            )}
           </button>
         </form>
 

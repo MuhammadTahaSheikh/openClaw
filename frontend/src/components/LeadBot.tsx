@@ -7,6 +7,8 @@ import {
   type Category,
   type Platform,
 } from "../api/leads";
+import { LeadCard } from "./LeadCard";
+import { ExportLeadsButtons } from "./ExportLeadsButtons";
 
 function todayIsoDate(): string {
   return new Date().toISOString().slice(0, 10);
@@ -51,6 +53,12 @@ export function LeadBot() {
 
     if (!platform || !category) {
       setError("Select a platform and category.");
+      return;
+    }
+
+    const selected = platforms.find((item) => item.id === platform);
+    if (selected?.enabled === false) {
+      setError(`${selected.name} is coming soon. Please use OnlineJobs.ph for now.`);
       return;
     }
 
@@ -99,6 +107,7 @@ export function LeadBot() {
                 {platforms.map((item) => (
                   <option key={item.id} value={item.id}>
                     {item.name}
+                    {item.enabled === false ? " " : ""}
                   </option>
                 ))}
               </select>
@@ -131,27 +140,57 @@ export function LeadBot() {
           </label>
 
           {useDateFilter && (
-            <div className="form-row">
-              <label>
-                Start date
-                <input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  disabled={loading}
-                />
-              </label>
+            <>
+              <div className="form-row">
+                <label>
+                  Start date
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    disabled={loading}
+                  />
+                </label>
 
-              <label>
-                End date
-                <input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
+                <label>
+                  End date
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    disabled={loading}
+                  />
+                </label>
+              </div>
+              <p className="hint date-filter-note">
+                Only jobs <strong>posted on the platform</strong> between these dates are included.
+                Widen the range or turn off the filter to get more leads.
+              </p>
+              <div className="date-presets">
+                <button
+                  type="button"
+                  className="btn-secondary"
                   disabled={loading}
-                />
-              </label>
-            </div>
+                  onClick={() => {
+                    setStartDate(daysAgoIsoDate(7));
+                    setEndDate(todayIsoDate());
+                  }}
+                >
+                  Last 7 days
+                </button>
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  disabled={loading}
+                  onClick={() => {
+                    setStartDate(daysAgoIsoDate(30));
+                    setEndDate(todayIsoDate());
+                  }}
+                >
+                  Last 30 days
+                </button>
+              </div>
+            </>
           )}
 
           {selectedPlatform && <p className="hint">{selectedPlatform.description}</p>}
@@ -180,8 +219,19 @@ export function LeadBot() {
             />
           </label>
 
-          <button type="submit" disabled={loading || platforms.length === 0 || categories.length === 0}>
-            {loading ? "Scraping leads..." : "Run Bot"}
+          <button
+            type="submit"
+            className="btn-primary"
+            disabled={loading || platforms.length === 0 || categories.length === 0}
+          >
+            {loading ? (
+              <>
+                <span className="spinner spinner-sm" aria-hidden />
+                Scraping leads…
+              </>
+            ) : (
+              "Run Bot"
+            )}
           </button>
         </form>
 
@@ -191,10 +241,16 @@ export function LeadBot() {
       {result && (
         <section className="panel results">
           <div className="results-header">
-            <h3>
-              {result.totalFound} {result.category} leads
-            </h3>
-            <span className="meta">
+            <div>
+              <h3>
+                {result.totalFound} {result.category} leads
+              </h3>
+              <span className="meta">
+              {result.runBy && (
+                <>
+                  Run by <strong>{result.runBy.name}</strong> ·{" "}
+                </>
+              )}
               {result.totalOnPlatform !== null && (
                 <>
                   {result.totalOnPlatform} on platform · {result.pagesScraped} pages scraped ·{" "}
@@ -208,9 +264,26 @@ export function LeadBot() {
               {result.skippedDuplicates > 0
                 ? ` · ${result.skippedDuplicates} duplicates skipped`
                 : ""}{" "}
-              · {new Date(result.scrapedAt).toLocaleString()}
-            </span>
+              · {new Date(result.runAt).toLocaleString()}
+              </span>
+            </div>
+            <ExportLeadsButtons
+              leads={result.leads}
+              filenameBase={`${result.category}-${result.platform}`}
+              pdfTitle={`${result.category} Leads`}
+              pdfSubtitle={`${result.platform} · ${result.totalFound} leads · ${new Date(result.runAt).toLocaleString()}`}
+            />
           </div>
+
+          {result.startDate && result.endDate && result.totalRelevant > result.totalFound && (
+            <p className="date-filter-warning">
+              Date filter: <strong>{result.totalFound}</strong> of{" "}
+              <strong>{result.totalRelevant}</strong> collected jobs were posted between{" "}
+              <strong>{result.startDate}</strong> and <strong>{result.endDate}</strong>. OnlineJobs.ph
+              only had {result.totalFound} matching that range — widen dates or disable the filter for
+              more results.
+            </p>
+          )}
 
           <div className="lead-list">
             {result.leads.length === 0 && (
@@ -220,39 +293,7 @@ export function LeadBot() {
             )}
 
             {result.leads.map((lead) => (
-              <article key={lead.id} className="lead-card">
-                <div className="lead-top">
-                  <h4>
-                    <a href={lead.url} target="_blank" rel="noreferrer">
-                      {lead.title}
-                    </a>
-                  </h4>
-                  {lead.employmentType && <span className="badge">{lead.employmentType}</span>}
-                </div>
-
-                <div className="lead-meta">
-                  {lead.salary && <span>💰 {lead.salary}</span>}
-                  {lead.postedAt && <span>📅 {lead.postedAt}</span>}
-                </div>
-
-                {lead.description && (
-                  <p className="lead-desc">
-                    {lead.description.length > 220
-                      ? `${lead.description.slice(0, 220)}…`
-                      : lead.description}
-                  </p>
-                )}
-
-                {lead.skills.length > 0 && (
-                  <div className="skills">
-                    {lead.skills.map((skill) => (
-                      <span key={skill} className="skill">
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </article>
+              <LeadCard key={lead.id} lead={lead} />
             ))}
           </div>
         </section>

@@ -12,7 +12,8 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   if (isLoading) {
     return (
       <div className="loading-screen">
-        <p>Loading...</p>
+        <div className="spinner" aria-hidden />
+        <p>Loading your workspace…</p>
       </div>
     );
   }

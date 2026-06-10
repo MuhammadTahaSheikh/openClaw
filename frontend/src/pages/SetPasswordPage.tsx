@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { setPasswordFromInvite, verifyInvite } from "../api/auth";
+import { BrandLogo } from "../components/BrandLogo";
 import { useAuth } from "../context/AuthContext";
 
 export function SetPasswordPage() {
@@ -66,8 +67,9 @@ export function SetPasswordPage() {
   if (loadingInvite) {
     return (
       <main className="auth-page">
-        <div className="panel auth-panel">
-          <p className="meta">Verifying invite...</p>
+        <div className="panel auth-panel loading-inline">
+          <div className="spinner" aria-hidden />
+          <p className="meta">Verifying invite…</p>
         </div>
       </main>
     );
@@ -80,7 +82,7 @@ export function SetPasswordPage() {
           <h1>Invite expired</h1>
           <p className="error">{inviteError}</p>
           <p className="hint">Ask your admin to send a new invite.</p>
-          <Link to="/login" className="nav-link" style={{ display: "inline-block", marginTop: "1rem" }}>
+          <Link to="/login" className="btn-secondary" style={{ display: "inline-flex", marginTop: "1rem" }}>
             Go to login
           </Link>
         </div>
@@ -91,8 +93,9 @@ export function SetPasswordPage() {
   return (
     <main className="auth-page">
       <div className="panel auth-panel">
+        <BrandLogo size="md" />
         <h1>Set your password</h1>
-        <p className="subtitle">Welcome, {name}! Create a password to access OpenClaw.</p>
+        <p className="subtitle">Welcome, {name}! Create a password to access BestechVision.</p>
 
         <form className="auth-form" onSubmit={handleSubmit}>
           <label>
@@ -128,8 +131,15 @@ export function SetPasswordPage() {
 
           {error && <p className="error">{error}</p>}
 
-          <button type="submit" disabled={submitting}>
-            {submitting ? "Creating account..." : "Create account & sign in"}
+          <button type="submit" className="btn-primary" disabled={submitting}>
+            {submitting ? (
+              <>
+                <span className="spinner spinner-sm" aria-hidden />
+                Creating account…
+              </>
+            ) : (
+              "Create account & sign in"
+            )}
           </button>
         </form>
       </div>

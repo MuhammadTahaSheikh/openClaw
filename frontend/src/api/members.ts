@@ -39,3 +39,25 @@ export async function resendMemberInvite(memberId: number): Promise<{ member: Me
   });
   return data;
 }
+
+export async function updateMember(
+  memberId: number,
+  input: {
+    name?: string;
+    email?: string;
+    phone?: string | null;
+    role?: string | null;
+    notes?: string | null;
+  },
+): Promise<{ member: Member; message: string }> {
+  return apiFetch<{ member: Member; message: string }>(`/api/members/${memberId}`, {
+    method: "PUT",
+    body: JSON.stringify(input),
+  });
+}
+
+export async function deleteMember(memberId: number): Promise<{ message: string }> {
+  return apiFetch<{ message: string }>(`/api/members/${memberId}`, {
+    method: "DELETE",
+  });
+}

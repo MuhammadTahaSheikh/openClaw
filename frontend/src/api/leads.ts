@@ -1,7 +1,10 @@
+import { apiFetch } from "./client";
+
 export type Platform = {
   id: string;
   name: string;
   description: string;
+  enabled?: boolean;
 };
 
 export type Category = {
@@ -22,6 +25,13 @@ export type Lead = {
   keyword: string;
 };
 
+export type BotRunBy = {
+  userId: number;
+  memberId: number | null;
+  name: string;
+  email: string;
+};
+
 export type BotRunResult = {
   platform: string;
   category: string;
@@ -35,8 +45,28 @@ export type BotRunResult = {
   totalRelevant: number;
   savedToDatabase: number;
   skippedDuplicates: number;
+  runBy: BotRunBy | null;
+  runAt: string;
   leads: Lead[];
   scrapedAt: string;
+};
+
+export type BotRunHistoryItem = {
+  id: number;
+  platform: string;
+  category: string;
+  keyword: string;
+  startDate: string | null;
+  endDate: string | null;
+  totalFound: number;
+  totalScanned: number;
+  totalRelevant: number;
+  runBy: BotRunBy | null;
+  runAt: string;
+};
+
+export type BotRunDetail = BotRunHistoryItem & {
+  leads: Lead[];
 };
 
 const API_BASE = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
@@ -66,16 +96,17 @@ export async function runLeadBot(input: {
   startDate?: string;
   endDate?: string;
 }): Promise<BotRunResult> {
-  const response = await fetch(`${API_BASE}/api/bot/run`, {
+  return apiFetch<BotRunResult>("/api/bot/run", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(input),
   });
+}
 
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.error ?? "Bot run failed");
-  }
+export async function fetchBotRunHistory(limit = 20): Promise<BotRunHistoryItem[]> {
+  const data = await apiFetch<{ runs: BotRunHistoryItem[] }>(`/api/bot/runs?limit=${limit}`);
+  return data.runs;
+}
 
-  return data as BotRunResult;
+export async function fetchBotRunDetail(runId: number): Promise<BotRunDetail> {
+  return apiFetch<BotRunDetail>(`/api/bot/runs/${runId}`);
 }

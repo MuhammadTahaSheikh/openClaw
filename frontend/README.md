@@ -1,6 +1,6 @@
-# OpenClaw Frontend
+# BestechVision Frontend
 
-React + Vite lead bot UI for OpenClaw.
+React + Vite lead bot UI for BestechVision.
 
 ## Setup
 

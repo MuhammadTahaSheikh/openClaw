@@ -1,6 +1,44 @@
 import { FormEvent, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { createMember, fetchMembers, resendMemberInvite, type Member } from "../api/members";
+import {
+  createMember,
+  deleteMember,
+  fetchMembers,
+  resendMemberInvite,
+  updateMember,
+  type Member,
+} from "../api/members";
+
+const MEMBER_ROLES = [
+  "Developer",
+  "Web Developer",
+  "Virtual Assistant",
+  "Sales",
+  "Lead Generation",
+  "Marketing",
+  "Bookkeeping",
+  "Manager",
+  "Admin",
+  "Customer Support",
+] as const;
+
+type EditForm = {
+  name: string;
+  email: string;
+  phone: string;
+  role: string;
+  notes: string;
+};
+
+function toEditForm(member: Member): EditForm {
+  return {
+    name: member.name,
+    email: member.email,
+    phone: member.phone ?? "",
+    role: member.role ?? "",
+    notes: member.notes ?? "",
+  };
+}
 
 export function AddMemberPage() {
   const [name, setName] = useState("");
@@ -14,6 +52,10 @@ export function AddMemberPage() {
   const [members, setMembers] = useState<Member[]>([]);
   const [loadingMembers, setLoadingMembers] = useState(true);
   const [resendingId, setResendingId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editForm, setEditForm] = useState<EditForm | null>(null);
+  const [savingId, setSavingId] = useState<number | null>(null);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   useEffect(() => {
     fetchMembers()
@@ -67,6 +109,64 @@ export function AddMemberPage() {
     }
   }
 
+  function startEdit(member: Member) {
+    setEditingId(member.id);
+    setEditForm(toEditForm(member));
+    setError(null);
+    setSuccess(null);
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
+    setEditForm(null);
+  }
+
+  async function handleSaveEdit(member: Member) {
+    if (!editForm) return;
+
+    setSavingId(member.id);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const { member: updated, message } = await updateMember(member.id, {
+        name: editForm.name,
+        email: member.inviteStatus === "pending" ? editForm.email : undefined,
+        phone: editForm.phone || null,
+        role: editForm.role || null,
+        notes: editForm.notes || null,
+      });
+
+      setMembers((prev) => prev.map((m) => (m.id === member.id ? updated : m)));
+      setSuccess(message);
+      cancelEdit();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update member");
+    } finally {
+      setSavingId(null);
+    }
+  }
+
+  async function handleDelete(member: Member) {
+    const label = member.inviteStatus === "accepted" ? "remove their login too" : "delete this invite";
+    if (!window.confirm(`Delete ${member.name}? This will ${label}.`)) return;
+
+    setDeletingId(member.id);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const { message } = await deleteMember(member.id);
+      setMembers((prev) => prev.filter((m) => m.id !== member.id));
+      if (editingId === member.id) cancelEdit();
+      setSuccess(message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete member");
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
   return (
     <div className="page-content">
       <div className="panel">
@@ -111,12 +211,14 @@ export function AddMemberPage() {
 
             <label>
               Role
-              <input
-                type="text"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                placeholder="Developer, Manager, etc."
-              />
+              <select value={role} onChange={(e) => setRole(e.target.value)}>
+                <option value="">Select role</option>
+                {MEMBER_ROLES.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
             </label>
           </div>
 
@@ -130,11 +232,18 @@ export function AddMemberPage() {
             />
           </label>
 
-          {error && <p className="error">{error}</p>}
-          {success && <p className="success">{success}</p>}
+          {error && !editingId && <p className="error">{error}</p>}
+          {success && !editingId && <p className="success">{success}</p>}
 
-          <button type="submit" disabled={submitting}>
-            {submitting ? "Adding..." : "Add member"}
+          <button type="submit" className="btn-primary" disabled={submitting}>
+            {submitting ? (
+              <>
+                <span className="spinner spinner-sm" aria-hidden />
+                Adding…
+              </>
+            ) : (
+              "Add member"
+            )}
           </button>
         </form>
       </div>
@@ -142,8 +251,8 @@ export function AddMemberPage() {
       <div className="panel">
         <div className="results-header">
           <h3>Members ({members.length})</h3>
-          <Link to="/" className="nav-link">
-            Back to Lead Bot
+          <Link to="/" className="back-link">
+            ← Back to Lead Bot
           </Link>
         </div>
 
@@ -155,25 +264,115 @@ export function AddMemberPage() {
           <div className="member-list">
             {members.map((member) => (
               <article key={member.id} className="member-card">
-                <div className="member-top">
-                  <h4>{member.name}</h4>
-                  {member.role && <span className="badge">{member.role}</span>}
-                  <span className={`badge ${member.inviteStatus === "accepted" ? "badge-success" : "badge-pending"}`}>
-                    {member.inviteStatus === "accepted" ? "Active" : "Invite pending"}
-                  </span>
-                </div>
-                <p className="member-meta">{member.email}</p>
-                {member.phone && <p className="member-meta">{member.phone}</p>}
-                {member.notes && <p className="member-notes">{member.notes}</p>}
-                {member.inviteStatus === "pending" && (
-                  <button
-                    type="button"
-                    className="btn-secondary resend-btn"
-                    disabled={resendingId === member.id}
-                    onClick={() => handleResendInvite(member.id)}
-                  >
-                    {resendingId === member.id ? "Sending..." : "Resend invite"}
-                  </button>
+                {editingId === member.id && editForm ? (
+                  <div className="member-edit-form">
+                    <div className="form-row">
+                      <label>
+                        Full name *
+                        <input
+                          type="text"
+                          value={editForm.name}
+                          onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                          required
+                        />
+                      </label>
+                      <label>
+                        Email *
+                        <input
+                          type="email"
+                          value={editForm.email}
+                          onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                          disabled={member.inviteStatus === "accepted"}
+                          required
+                        />
+                      </label>
+                    </div>
+                    <div className="form-row">
+                      <label>
+                        Phone
+                        <input
+                          type="tel"
+                          value={editForm.phone}
+                          onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                        />
+                      </label>
+                      <label>
+                        Role
+                        <select
+                          value={editForm.role}
+                          onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
+                        >
+                          <option value="">Select role</option>
+                          {MEMBER_ROLES.map((option) => (
+                            <option key={option} value={option}>
+                              {option}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                    </div>
+                    <label>
+                      Notes
+                      <input
+                        type="text"
+                        value={editForm.notes}
+                        onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
+                      />
+                    </label>
+                    {error && <p className="error">{error}</p>}
+                    {success && <p className="success">{success}</p>}
+                    <div className="member-actions">
+                      <button
+                        type="button"
+                        className="btn-primary btn-sm"
+                        disabled={savingId === member.id}
+                        onClick={() => handleSaveEdit(member)}
+                      >
+                        {savingId === member.id ? "Saving…" : "Save"}
+                      </button>
+                      <button type="button" className="btn-secondary" onClick={cancelEdit}>
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="member-top">
+                      <h4>{member.name}</h4>
+                      {member.role && <span className="badge">{member.role}</span>}
+                      <span
+                        className={`badge ${member.inviteStatus === "accepted" ? "badge-success" : "badge-pending"}`}
+                      >
+                        {member.inviteStatus === "accepted" ? "Active" : "Invite pending"}
+                      </span>
+                    </div>
+                    <p className="member-meta">{member.email}</p>
+                    {member.phone && <p className="member-meta">{member.phone}</p>}
+                    {member.notes && <p className="member-notes">{member.notes}</p>}
+                    <div className="member-actions">
+                      <button type="button" className="btn-secondary" onClick={() => startEdit(member)}>
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        className="btn-danger btn-sm"
+                        disabled={deletingId === member.id}
+                        onClick={() => handleDelete(member)}
+                      >
+                        {deletingId === member.id ? "Deleting…" : "Delete"}
+                      </button>
+                      {member.inviteStatus === "pending" && (
+                        <button
+                          type="button"
+                          className="btn-secondary"
+                          disabled={resendingId === member.id}
+                          onClick={() => handleResendInvite(member.id)}
+                        >
+                          {resendingId === member.id ? "Sending..." : "Resend invite"}
+                        </button>
+                      )}
+                    </div>
+                  </>
                 )}
               </article>
             ))}
