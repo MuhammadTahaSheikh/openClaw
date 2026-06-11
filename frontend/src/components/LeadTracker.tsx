@@ -70,6 +70,10 @@ function getLinkHref(field: keyof TrackerRowInput, value: string): string | null
   return null;
 }
 
+function colClass(field: keyof TrackerRowInput): string {
+  return `tracker-col tracker-col-${field}`;
+}
+
 function getCellValue(row: TrackerRow, field: keyof TrackerRowInput): string {
   if (field === "date") return formatDateForInput(row.date);
   return ((row[field] ?? "") as string);
@@ -214,14 +218,19 @@ export function LeadTracker() {
               </div>
             )}
             {tracker.rows.length > 0 && (
-              <button
-                type="button"
-                className="btn-secondary"
-                onClick={handleExportCsv}
-                disabled={exporting}
-              >
-                {exporting ? "Exporting…" : "Export CSV"}
-              </button>
+              <div className="tracker-toolbar-actions">
+                <span className="tracker-row-count">
+                  {tracker.rows.length} lead{tracker.rows.length === 1 ? "" : "s"}
+                </span>
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={handleExportCsv}
+                  disabled={exporting}
+                >
+                  {exporting ? "Exporting…" : "Export CSV"}
+                </button>
+              </div>
             )}
           </div>
         )}
@@ -239,8 +248,8 @@ export function LeadTracker() {
             <form className="tracker-add-form" onSubmit={handleAddRow}>
                 <h3>New lead</h3>
                 <div className="tracker-add-grid">
-                  {TRACKER_FIELDS.map(({ key: field, label }) => (
-                    <label key={field}>
+                  {TRACKER_FIELDS.map(({ key: field, label, wide }) => (
+                    <label key={field} className={wide ? "tracker-add-field-wide" : undefined}>
                       {label}
                       {SELECT_FIELDS.has(field) ? (
                         <select
@@ -288,11 +297,15 @@ export function LeadTracker() {
               <table className="tracker-table">
                 <thead>
                   <tr>
-                    {showOwnerColumn && <th>Team Member</th>}
-                    {TRACKER_FIELDS.map(({ key, label }) => (
-                      <th key={key}>{label}</th>
+                    {showOwnerColumn && <th className="tracker-owner-cell tracker-col-sticky-left">Team Member</th>}
+                    {TRACKER_FIELDS.map(({ key, label, tableLabel }) => (
+                      <th key={key} className={colClass(key)} title={tableLabel ? label : undefined}>
+                        {tableLabel ?? label}
+                      </th>
                     ))}
-                    <th aria-label="Actions" />
+                    <th className="tracker-col-actions tracker-col-sticky-right" aria-label="Actions">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -309,7 +322,7 @@ export function LeadTracker() {
                   {tracker.rows.map((row) => (
                     <tr key={`${row.id}-${row.updatedAt}`}>
                       {showOwnerColumn && (
-                        <td className="tracker-owner-cell">
+                        <td className="tracker-owner-cell tracker-col-sticky-left">
                           {row.ownerName ?? user?.name ?? "Unknown"}
                         </td>
                       )}
@@ -319,36 +332,42 @@ export function LeadTracker() {
                         const href = LINK_FIELDS.has(field) ? getLinkHref(field, value) : null;
                         const isEditing = editingCell === cellKey;
                         const showAsLink = LINK_FIELDS.has(field) && href && !isEditing;
+                        const fieldClass = colClass(field);
 
                         if (showAsLink) {
                           return (
-                            <td key={field} className="tracker-link-cell">
-                              <a
-                                className="tracker-cell-link"
-                                href={href}
-                                target={field === "email" ? undefined : "_blank"}
-                                rel={field === "email" ? undefined : "noopener noreferrer"}
-                                title={field === "email" ? `Email ${value}` : `Open ${value}`}
-                              >
-                                {value}
-                              </a>
-                              <button
-                                type="button"
-                                className="tracker-cell-edit"
-                                onClick={() => setEditingCell(cellKey)}
-                                title="Edit"
-                              >
-                                Edit
-                              </button>
+                            <td key={field} className={`${fieldClass} tracker-link-cell`}>
+                              <div className="tracker-link-cell-inner">
+                                <a
+                                  className="tracker-cell-link"
+                                  href={href}
+                                  target={field === "email" ? undefined : "_blank"}
+                                  rel={field === "email" ? undefined : "noopener noreferrer"}
+                                  title={value}
+                                >
+                                  {value}
+                                </a>
+                                <button
+                                  type="button"
+                                  className="tracker-cell-edit"
+                                  onClick={() => setEditingCell(cellKey)}
+                                  aria-label={`Edit ${field}`}
+                                  title="Edit"
+                                >
+                                  <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden>
+                                    <path d="M13.586 3.586a2 2 0 0 1 2.828 2.828l-8.5 8.5a1 1 0 0 1-.434.262l-3.5 1a1 1 0 0 1-1.213-1.213l1-3.5a1 1 0 0 1 .262-.434l8.5-8.5z" />
+                                  </svg>
+                                </button>
+                              </div>
                             </td>
                           );
                         }
 
                         if (SELECT_FIELDS.has(field)) {
                           return (
-                            <td key={field}>
+                            <td key={field} className={fieldClass}>
                               <select
-                                className="tracker-cell-input"
+                                className="tracker-cell-input tracker-cell-select"
                                 value={value}
                                 onChange={(e) => handleCellBlur(row, field, e.target.value)}
                               >
@@ -363,11 +382,12 @@ export function LeadTracker() {
                         }
 
                         return (
-                          <td key={field}>
+                          <td key={field} className={fieldClass}>
                             <input
                               className="tracker-cell-input"
                               type={field === "date" ? "date" : "text"}
                               defaultValue={value}
+                              placeholder="—"
                               autoFocus={isEditing}
                               onBlur={(e) => {
                                 handleCellBlur(row, field, e.target.value);
@@ -377,7 +397,7 @@ export function LeadTracker() {
                           </td>
                         );
                       })}
-                      <td>
+                      <td className="tracker-col-actions tracker-col-sticky-right">
                         <button
                           type="button"
                           className="btn-danger btn-sm tracker-delete-btn"
