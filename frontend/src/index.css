@@ -581,7 +581,8 @@ body::before {
 .member-edit-form input,
 .member-edit-form select,
 .tracker-filter select,
-.tracker-add-grid input {
+.tracker-add-grid input,
+.tracker-add-grid select {
   width: 100%;
   padding: 0.625rem 0.8rem;
   border-radius: var(--radius-md);
@@ -596,7 +597,8 @@ body::before {
 .bot-form input:hover,
 .bot-form select:hover,
 .auth-form input:hover,
-.tracker-add-grid input:hover {
+.tracker-add-grid input:hover,
+.tracker-add-grid select:hover {
   border-color: var(--text-subtle);
 }
 
@@ -606,7 +608,8 @@ body::before {
 .member-edit-form input:focus,
 .member-edit-form select:focus,
 .tracker-filter select:focus,
-.tracker-add-grid input:focus {
+.tracker-add-grid input:focus,
+.tracker-add-grid select:focus {
   outline: none;
   border-color: var(--border-focus);
   box-shadow: 0 0 0 3px var(--focus-ring);

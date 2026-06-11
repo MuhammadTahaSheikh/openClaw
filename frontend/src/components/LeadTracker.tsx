@@ -15,6 +15,7 @@ const FIELD_KEYS: (keyof TrackerRowInput)[] = [
   "date",
   "name",
   "jobTitle",
+  "employmentType",
   "email",
   "linkedin",
   "phone",
@@ -28,6 +29,7 @@ const EMPTY_ROW: TrackerRowInput = {
   date: "",
   name: "",
   jobTitle: "",
+  employmentType: "",
   email: "",
   linkedin: "",
   phone: "",
@@ -48,6 +50,14 @@ function formatDateForInput(value: string | null | undefined): string {
 }
 
 const LINK_FIELDS = new Set<keyof TrackerRowInput>(["email", "source"]);
+
+const EMPLOYMENT_TYPE_OPTIONS = [
+  { value: "", label: "—" },
+  { value: "Part-time", label: "Part-time" },
+  { value: "Full-time", label: "Full-time" },
+] as const;
+
+const SELECT_FIELDS = new Set<keyof TrackerRowInput>(["employmentType"]);
 
 function getLinkHref(field: keyof TrackerRowInput, value: string): string | null {
   const trimmed = value.trim();
@@ -150,6 +160,7 @@ export function LeadTracker() {
         date: row.date,
         name: row.name,
         jobTitle: row.jobTitle,
+        employmentType: row.employmentType,
         email: row.email,
         linkedin: row.linkedin,
         phone: row.phone,
@@ -242,12 +253,26 @@ export function LeadTracker() {
                   {FIELD_KEYS.map((field, index) => (
                     <label key={field}>
                       {tracker.headers[index]}
-                      <input
-                        type={field === "date" ? "date" : "text"}
-                        value={(draft[field] as string) ?? ""}
-                        onChange={(e) => setDraft((prev) => ({ ...prev, [field]: e.target.value }))}
-                        disabled={saving}
-                      />
+                      {SELECT_FIELDS.has(field) ? (
+                        <select
+                          value={(draft[field] as string) ?? ""}
+                          onChange={(e) => setDraft((prev) => ({ ...prev, [field]: e.target.value }))}
+                          disabled={saving}
+                        >
+                          {EMPLOYMENT_TYPE_OPTIONS.map((option) => (
+                            <option key={option.value || "empty"} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <input
+                          type={field === "date" ? "date" : "text"}
+                          value={(draft[field] as string) ?? ""}
+                          onChange={(e) => setDraft((prev) => ({ ...prev, [field]: e.target.value }))}
+                          disabled={saving}
+                        />
+                      )}
                     </label>
                   ))}
                 </div>
@@ -326,6 +351,24 @@ export function LeadTracker() {
                               >
                                 Edit
                               </button>
+                            </td>
+                          );
+                        }
+
+                        if (SELECT_FIELDS.has(field)) {
+                          return (
+                            <td key={field}>
+                              <select
+                                className="tracker-cell-input"
+                                value={value}
+                                onChange={(e) => handleCellBlur(row, field, e.target.value)}
+                              >
+                                {EMPLOYMENT_TYPE_OPTIONS.map((option) => (
+                                  <option key={option.value || "empty"} value={option.value}>
+                                    {option.label}
+                                  </option>
+                                ))}
+                              </select>
                             </td>
                           );
                         }

@@ -4,6 +4,7 @@ export type TrackerRowInput = {
   date?: string | null;
   name?: string | null;
   jobTitle?: string | null;
+  employmentType?: string | null;
   email?: string | null;
   linkedin?: string | null;
   phone?: string | null;

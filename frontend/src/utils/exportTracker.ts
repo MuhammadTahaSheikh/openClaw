@@ -4,6 +4,7 @@ const FIELD_KEYS: (keyof TrackerRowInput)[] = [
   "date",
   "name",
   "jobTitle",
+  "employmentType",
   "email",
   "linkedin",
   "phone",
