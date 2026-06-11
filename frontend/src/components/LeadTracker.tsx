@@ -9,6 +9,7 @@ import {
   type TrackerRowInput,
   type TrackerState,
 } from "../api/tracker";
+import { exportTrackerToCsv } from "../utils/exportTracker";
 
 const FIELD_KEYS: (keyof TrackerRowInput)[] = [
   "date",
@@ -84,8 +85,24 @@ export function LeadTracker() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [editingCell, setEditingCell] = useState<string | null>(null);
+  const [exporting, setExporting] = useState(false);
 
   const showOwnerColumn = true;
+
+  function handleExportCsv() {
+    if (!tracker || tracker.rows.length === 0) return;
+
+    setExporting(true);
+    try {
+      const filterLabel =
+        filterUserId === "all"
+          ? "all-members"
+          : tracker.users?.find((member) => member.id === filterUserId)?.name ?? "filtered";
+      exportTrackerToCsv(tracker.rows, tracker.headers, `lead-tracker-${filterLabel}`);
+    } finally {
+      setExporting(false);
+    }
+  }
 
   async function loadTracker(userId?: number) {
     setError(null);
@@ -168,30 +185,44 @@ export function LeadTracker() {
           shows who added each row.
         </p>
 
-        {tracker?.users && (
-          <div className="tracker-filter">
-            <label>
-              Show leads for
-              <select
-                value={filterUserId === "all" ? "all" : String(filterUserId)}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setFilterUserId(value === "all" ? "all" : Number(value));
-                }}
+        {tracker && (
+          <div className="tracker-toolbar">
+            {tracker.users && (
+              <div className="tracker-filter">
+                <label>
+                  Show leads for
+                  <select
+                    value={filterUserId === "all" ? "all" : String(filterUserId)}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setFilterUserId(value === "all" ? "all" : Number(value));
+                    }}
+                  >
+                    <option value="all">All members</option>
+                    {user && (
+                      <option value={String(user.id)}>My leads ({user.name})</option>
+                    )}
+                    {tracker.users
+                      .filter((member) => member.id !== user?.id)
+                      .map((member) => (
+                        <option key={member.id} value={String(member.id)}>
+                          {member.name}
+                        </option>
+                      ))}
+                  </select>
+                </label>
+              </div>
+            )}
+            {tracker.rows.length > 0 && (
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={handleExportCsv}
+                disabled={exporting}
               >
-                <option value="all">All members</option>
-                {user && (
-                  <option value={String(user.id)}>My leads ({user.name})</option>
-                )}
-                {tracker.users
-                  .filter((member) => member.id !== user?.id)
-                  .map((member) => (
-                    <option key={member.id} value={String(member.id)}>
-                      {member.name}
-                    </option>
-                  ))}
-              </select>
-            </label>
+                {exporting ? "Exporting…" : "Export CSV"}
+              </button>
+            )}
           </div>
         )}
 

@@ -1033,8 +1033,17 @@ body::before {
 }
 
 /* ─── Lead Tracker ──────────────────────────────────────────────── */
-.tracker-filter {
+.tracker-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem;
   margin-bottom: 1.25rem;
+}
+
+.tracker-filter {
+  margin-bottom: 0;
 }
 
 .tracker-filter label {
