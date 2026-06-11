@@ -1,18 +1,5 @@
 import type { TrackerRow, TrackerRowInput } from "../api/tracker";
-
-const FIELD_KEYS: (keyof TrackerRowInput)[] = [
-  "date",
-  "name",
-  "jobTitle",
-  "employmentType",
-  "email",
-  "linkedin",
-  "phone",
-  "source",
-  "remarks",
-  "connects",
-  "projectPrice",
-];
+import { TRACKER_FIELD_KEYS, TRACKER_HEADERS } from "../lib/trackerFields";
 
 function formatDateForExport(value: string | null | undefined): string {
   if (!value) return "";
@@ -48,16 +35,12 @@ function getFieldValue(row: TrackerRow, field: keyof TrackerRowInput): string {
   return (row[field] ?? "") as string;
 }
 
-export function exportTrackerToCsv(
-  rows: TrackerRow[],
-  headers: string[],
-  filenameBase: string,
-): void {
-  const csvHeaders = ["Team Member", ...headers];
+export function exportTrackerToCsv(rows: TrackerRow[], filenameBase: string): void {
+  const csvHeaders = ["Team Member", ...TRACKER_HEADERS];
 
   const csvRows = rows.map((row) => [
     escapeCsvValue(row.ownerName ?? "Unknown"),
-    ...FIELD_KEYS.map((field) => escapeCsvValue(getFieldValue(row, field))),
+    ...TRACKER_FIELD_KEYS.map((field) => escapeCsvValue(getFieldValue(row, field))),
   ]);
 
   const csv = [csvHeaders.join(","), ...csvRows.map((row) => row.join(","))].join("\n");

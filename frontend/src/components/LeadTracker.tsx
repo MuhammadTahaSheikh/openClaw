@@ -10,20 +10,9 @@ import {
   type TrackerState,
 } from "../api/tracker";
 import { exportTrackerToCsv } from "../utils/exportTracker";
+import { TRACKER_FIELDS, TRACKER_FIELD_KEYS } from "../lib/trackerFields";
 
-const FIELD_KEYS: (keyof TrackerRowInput)[] = [
-  "date",
-  "name",
-  "jobTitle",
-  "employmentType",
-  "email",
-  "linkedin",
-  "phone",
-  "source",
-  "remarks",
-  "connects",
-  "projectPrice",
-];
+const FIELD_KEYS = TRACKER_FIELD_KEYS;
 
 const EMPTY_ROW: TrackerRowInput = {
   date: "",
@@ -108,7 +97,7 @@ export function LeadTracker() {
         filterUserId === "all"
           ? "all-members"
           : tracker.users?.find((member) => member.id === filterUserId)?.name ?? "filtered";
-      exportTrackerToCsv(tracker.rows, tracker.headers, `lead-tracker-${filterLabel}`);
+      exportTrackerToCsv(tracker.rows, `lead-tracker-${filterLabel}`);
     } finally {
       setExporting(false);
     }
@@ -250,9 +239,9 @@ export function LeadTracker() {
             <form className="tracker-add-form" onSubmit={handleAddRow}>
                 <h3>New lead</h3>
                 <div className="tracker-add-grid">
-                  {FIELD_KEYS.map((field, index) => (
+                  {TRACKER_FIELDS.map(({ key: field, label }) => (
                     <label key={field}>
-                      {tracker.headers[index]}
+                      {label}
                       {SELECT_FIELDS.has(field) ? (
                         <select
                           value={(draft[field] as string) ?? ""}
@@ -300,8 +289,8 @@ export function LeadTracker() {
                 <thead>
                   <tr>
                     {showOwnerColumn && <th>Team Member</th>}
-                    {tracker.headers.map((header) => (
-                      <th key={header}>{header}</th>
+                    {TRACKER_FIELDS.map(({ key, label }) => (
+                      <th key={key}>{label}</th>
                     ))}
                     <th aria-label="Actions" />
                   </tr>
@@ -310,7 +299,7 @@ export function LeadTracker() {
                   {tracker.rows.length === 0 && (
                     <tr>
                       <td
-                        colSpan={tracker.headers.length + (showOwnerColumn ? 2 : 1)}
+                        colSpan={TRACKER_FIELDS.length + (showOwnerColumn ? 2 : 1)}
                         className="tracker-empty"
                       >
                         No rows yet. Add your first lead above.
