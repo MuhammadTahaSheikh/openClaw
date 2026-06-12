@@ -102,11 +102,36 @@ export async function runLeadBot(input: {
   });
 }
 
-export async function fetchBotRunHistory(limit = 20): Promise<BotRunHistoryItem[]> {
-  const data = await apiFetch<{ runs: BotRunHistoryItem[] }>(`/api/bot/runs?limit=${limit}`);
+export async function fetchBotRunHistory(
+  limit = 20,
+  filters: { date?: string; category?: string } = {},
+): Promise<BotRunHistoryItem[]> {
+  const params = new URLSearchParams({ limit: String(limit) });
+  if (filters.date) params.set("date", filters.date);
+  if (filters.category) params.set("category", filters.category);
+  const data = await apiFetch<{ runs: BotRunHistoryItem[] }>(`/api/bot/runs?${params}`);
   return data.runs;
 }
 
 export async function fetchBotRunDetail(runId: number): Promise<BotRunDetail> {
   return apiFetch<BotRunDetail>(`/api/bot/runs/${runId}`);
+}
+
+export async function fetchStoredLeads(input: {
+  startDate?: string;
+  endDate?: string;
+  platform?: string;
+  category?: string;
+  limit?: number;
+} = {}): Promise<Lead[]> {
+  const params = new URLSearchParams();
+  if (input.startDate) params.set("startDate", input.startDate);
+  if (input.endDate) params.set("endDate", input.endDate);
+  if (input.platform) params.set("platform", input.platform);
+  if (input.category) params.set("category", input.category);
+  if (input.limit) params.set("limit", String(input.limit));
+
+  const query = params.toString();
+  const data = await apiFetch<{ leads: Lead[] }>(`/api/leads${query ? `?${query}` : ""}`);
+  return data.leads;
 }

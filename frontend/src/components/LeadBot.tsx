@@ -58,7 +58,7 @@ export function LeadBot() {
 
     const selected = platforms.find((item) => item.id === platform);
     if (selected?.enabled === false) {
-      setError(`${selected.name} is coming soon. Please use OnlineJobs.ph for now.`);
+      setError(`${selected.name} is coming soon. Use OnlineJobs.ph or Upwork for now.`);
       return;
     }
 
@@ -279,9 +279,9 @@ export function LeadBot() {
             <p className="date-filter-warning">
               Date filter: <strong>{result.totalFound}</strong> of{" "}
               <strong>{result.totalRelevant}</strong> collected jobs were posted between{" "}
-              <strong>{result.startDate}</strong> and <strong>{result.endDate}</strong>. OnlineJobs.ph
-              only had {result.totalFound} matching that range — widen dates or disable the filter for
-              more results.
+              <strong>{result.startDate}</strong> and <strong>{result.endDate}</strong>. Only{" "}
+              {result.totalFound} matched that range on {result.platform} — widen dates or disable the
+              filter for more results.
             </p>
           )}
 
