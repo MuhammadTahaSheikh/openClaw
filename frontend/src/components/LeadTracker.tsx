@@ -193,7 +193,7 @@ export function LeadTracker() {
           <div className="tracker-toolbar">
             {tracker.users && (
               <div className="tracker-filter">
-                <label>
+                {/* <label>
                   Show leads for
                   <select
                     value={filterUserId === "all" ? "all" : String(filterUserId)}
@@ -214,7 +214,7 @@ export function LeadTracker() {
                         </option>
                       ))}
                   </select>
-                </label>
+                </label> */}
               </div>
             )}
             {tracker.rows.length > 0 && (
