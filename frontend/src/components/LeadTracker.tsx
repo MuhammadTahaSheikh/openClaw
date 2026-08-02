@@ -82,7 +82,7 @@ function getCellValue(row: TrackerRow, field: keyof TrackerRowInput): string {
 export function LeadTracker() {
   const { user } = useAuth();
   const [tracker, setTracker] = useState<TrackerState | null>(null);
-  const [filterUserId, setFilterUserId] = useState<number | "all">("all");
+  const [filterUserId] = useState<number | "all">("all");
   const [draft, setDraft] = useState<TrackerRowInput>({ ...EMPTY_ROW, date: todayIsoDate() });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
