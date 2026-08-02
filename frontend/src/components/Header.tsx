@@ -32,12 +32,12 @@ export function Header() {
           <Link to="/" className={location.pathname === "/" ? "nav-link active" : "nav-link"}>
             Lead Bot
           </Link>
-          <Link
+          {/* <Link
             to="/history"
             className={location.pathname === "/history" ? "nav-link active" : "nav-link"}
           >
             Run History
-          </Link>
+          </Link> */}
           <Link
             to="/tracker"
             className={location.pathname === "/tracker" ? "nav-link active" : "nav-link"}
