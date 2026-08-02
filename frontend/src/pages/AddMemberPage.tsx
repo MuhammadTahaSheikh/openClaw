@@ -1,12 +1,12 @@
-import { FormEvent, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { FormEvent, useState } from "react";
+// import { Link } from "react-router-dom";
 import {
   createMember,
-  deleteMember,
-  fetchMembers,
-  resendMemberInvite,
-  updateMember,
-  type Member,
+  // deleteMember,
+  // fetchMembers,
+  // resendMemberInvite,
+  // updateMember,
+  // type Member,
 } from "../api/members";
 
 const MEMBER_ROLES = [
@@ -22,23 +22,23 @@ const MEMBER_ROLES = [
   "Customer Support",
 ] as const;
 
-type EditForm = {
-  name: string;
-  email: string;
-  phone: string;
-  role: string;
-  notes: string;
-};
+// type EditForm = {
+//   name: string;
+//   email: string;
+//   phone: string;
+//   role: string;
+//   notes: string;
+// };
 
-function toEditForm(member: Member): EditForm {
-  return {
-    name: member.name,
-    email: member.email,
-    phone: member.phone ?? "",
-    role: member.role ?? "",
-    notes: member.notes ?? "",
-  };
-}
+// function toEditForm(member: Member): EditForm {
+//   return {
+//     name: member.name,
+//     email: member.email,
+//     phone: member.phone ?? "",
+//     role: member.role ?? "",
+//     notes: member.notes ?? "",
+//   };
+// }
 
 export function AddMemberPage() {
   const [name, setName] = useState("");
@@ -49,20 +49,20 @@ export function AddMemberPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [members, setMembers] = useState<Member[]>([]);
-  const [loadingMembers, setLoadingMembers] = useState(true);
-  const [resendingId, setResendingId] = useState<number | null>(null);
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [editForm, setEditForm] = useState<EditForm | null>(null);
-  const [savingId, setSavingId] = useState<number | null>(null);
-  const [deletingId, setDeletingId] = useState<number | null>(null);
+  // const [members, setMembers] = useState<Member[]>([]);
+  // const [loadingMembers, setLoadingMembers] = useState(true);
+  // const [resendingId, setResendingId] = useState<number | null>(null);
+  // const [editingId, setEditingId] = useState<number | null>(null);
+  // const [editForm, setEditForm] = useState<EditForm | null>(null);
+  // const [savingId, setSavingId] = useState<number | null>(null);
+  // const [deletingId, setDeletingId] = useState<number | null>(null);
 
-  useEffect(() => {
-    fetchMembers()
-      .then(setMembers)
-      .catch(() => setMembers([]))
-      .finally(() => setLoadingMembers(false));
-  }, []);
+  // useEffect(() => {
+  //   fetchMembers()
+  //     .then(setMembers)
+  //     .catch(() => setMembers([]))
+  //     .finally(() => setLoadingMembers(false));
+  // }, []);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -71,7 +71,7 @@ export function AddMemberPage() {
     setSubmitting(true);
 
     try {
-      const { member, message } = await createMember({
+      const { message } = await createMember({
         name,
         email,
         phone: phone || undefined,
@@ -79,7 +79,7 @@ export function AddMemberPage() {
         notes: notes || undefined,
       });
 
-      setMembers((prev) => [member, ...prev]);
+      // setMembers((prev) => [member, ...prev]);
       setSuccess(message);
       setName("");
       setEmail("");
@@ -93,79 +93,79 @@ export function AddMemberPage() {
     }
   }
 
-  async function handleResendInvite(memberId: number) {
-    setError(null);
-    setSuccess(null);
-    setResendingId(memberId);
+  // async function handleResendInvite(memberId: number) {
+  //   setError(null);
+  //   setSuccess(null);
+  //   setResendingId(memberId);
+  //
+  //   try {
+  //     const { member, message } = await resendMemberInvite(memberId);
+  //     setMembers((prev) => prev.map((m) => (m.id === memberId ? member : m)));
+  //     setSuccess(message);
+  //   } catch (err) {
+  //     setError(err instanceof Error ? err.message : "Failed to resend invite");
+  //   } finally {
+  //     setResendingId(null);
+  //   }
+  // }
 
-    try {
-      const { member, message } = await resendMemberInvite(memberId);
-      setMembers((prev) => prev.map((m) => (m.id === memberId ? member : m)));
-      setSuccess(message);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to resend invite");
-    } finally {
-      setResendingId(null);
-    }
-  }
+  // function startEdit(member: Member) {
+  //   setEditingId(member.id);
+  //   setEditForm(toEditForm(member));
+  //   setError(null);
+  //   setSuccess(null);
+  // }
 
-  function startEdit(member: Member) {
-    setEditingId(member.id);
-    setEditForm(toEditForm(member));
-    setError(null);
-    setSuccess(null);
-  }
+  // function cancelEdit() {
+  //   setEditingId(null);
+  //   setEditForm(null);
+  // }
 
-  function cancelEdit() {
-    setEditingId(null);
-    setEditForm(null);
-  }
+  // async function handleSaveEdit(member: Member) {
+  //   if (!editForm) return;
+  //
+  //   setSavingId(member.id);
+  //   setError(null);
+  //   setSuccess(null);
+  //
+  //   try {
+  //     const { member: updated, message } = await updateMember(member.id, {
+  //       name: editForm.name,
+  //       email: member.inviteStatus === "pending" ? editForm.email : undefined,
+  //       phone: editForm.phone || null,
+  //       role: editForm.role || null,
+  //       notes: editForm.notes || null,
+  //     });
+  //
+  //     setMembers((prev) => prev.map((m) => (m.id === member.id ? updated : m)));
+  //     setSuccess(message);
+  //     cancelEdit();
+  //   } catch (err) {
+  //     setError(err instanceof Error ? err.message : "Failed to update member");
+  //   } finally {
+  //     setSavingId(null);
+  //   }
+  // }
 
-  async function handleSaveEdit(member: Member) {
-    if (!editForm) return;
-
-    setSavingId(member.id);
-    setError(null);
-    setSuccess(null);
-
-    try {
-      const { member: updated, message } = await updateMember(member.id, {
-        name: editForm.name,
-        email: member.inviteStatus === "pending" ? editForm.email : undefined,
-        phone: editForm.phone || null,
-        role: editForm.role || null,
-        notes: editForm.notes || null,
-      });
-
-      setMembers((prev) => prev.map((m) => (m.id === member.id ? updated : m)));
-      setSuccess(message);
-      cancelEdit();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to update member");
-    } finally {
-      setSavingId(null);
-    }
-  }
-
-  async function handleDelete(member: Member) {
-    const label = member.inviteStatus === "accepted" ? "remove their login too" : "delete this invite";
-    if (!window.confirm(`Delete ${member.name}? This will ${label}.`)) return;
-
-    setDeletingId(member.id);
-    setError(null);
-    setSuccess(null);
-
-    try {
-      const { message } = await deleteMember(member.id);
-      setMembers((prev) => prev.filter((m) => m.id !== member.id));
-      if (editingId === member.id) cancelEdit();
-      setSuccess(message);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete member");
-    } finally {
-      setDeletingId(null);
-    }
-  }
+  // async function handleDelete(member: Member) {
+  //   const label = member.inviteStatus === "accepted" ? "remove their login too" : "delete this invite";
+  //   if (!window.confirm(`Delete ${member.name}? This will ${label}.`)) return;
+  //
+  //   setDeletingId(member.id);
+  //   setError(null);
+  //   setSuccess(null);
+  //
+  //   try {
+  //     const { message } = await deleteMember(member.id);
+  //     setMembers((prev) => prev.filter((m) => m.id !== member.id));
+  //     if (editingId === member.id) cancelEdit();
+  //     setSuccess(message);
+  //   } catch (err) {
+  //     setError(err instanceof Error ? err.message : "Failed to delete member");
+  //   } finally {
+  //     setDeletingId(null);
+  //   }
+  // }
 
   return (
     <div className="page-content">
@@ -232,8 +232,8 @@ export function AddMemberPage() {
             />
           </label>
 
-          {error && !editingId && <p className="error">{error}</p>}
-          {success && !editingId && <p className="success">{success}</p>}
+          {error && <p className="error">{error}</p>}
+          {success && <p className="success">{success}</p>}
 
           <button type="submit" className="btn-primary" disabled={submitting}>
             {submitting ? (
