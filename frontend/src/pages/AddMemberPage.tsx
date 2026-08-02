@@ -248,7 +248,7 @@ export function AddMemberPage() {
         </form>
       </div>
 
-      <div className="panel">
+      {/* <div className="panel">
         <div className="results-header">
           <h3>Members ({members.length})</h3>
           <Link to="/" className="back-link">
@@ -378,7 +378,7 @@ export function AddMemberPage() {
             ))}
           </div>
         )}
-      </div>
+      </div> */}
     </div>
   );
 }
